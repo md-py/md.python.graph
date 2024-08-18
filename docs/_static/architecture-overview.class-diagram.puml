@@ -1,0 +1,35 @@
+@startuml
+
+skinparam class {
+  BackgroundColor #ebebeb
+  ArrowColor      #333
+  BorderColor     #333
+}
+
+skinparam lineType ortho
+
+package md.python.graph {
+  interface GraphExceptionInterface {}
+
+  class TopologicalSortException extends GraphExceptionInterface {
+    + CYCLE_DETECTED = 1
+  }
+
+  interface TopologicalSortInterface {
+    + sort(graph: GraphType) -> Iterable[NodeType]
+  }
+
+  class AscendingTopologicalSort {
+    + sort(graph: GraphType) -> Iterable[NodeType]
+  }
+
+  class DescendingTopologicalSort {
+    + sort(graph: GraphType) -> Iterable[NodeType]
+  }
+
+  AscendingTopologicalSort .left.> TopologicalSortException : raises
+  AscendingTopologicalSort -up-|>  TopologicalSortInterface
+  DescendingTopologicalSort -up-|>  TopologicalSortInterface
+}
+
+@enduml
