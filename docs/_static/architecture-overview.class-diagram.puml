@@ -15,19 +15,19 @@ package md.python.graph {
     + CYCLE_DETECTED = 1
   }
 
-  interface TopologicalSortInterface {
-    + sort(graph: GraphType) -> Iterable[NodeType]
+  interface TopologicalSortInterface <NodeType of typing.Hashable> {
+    + sort(graph: GraphType[NodeType]) -> Iterable[NodeType]
   }
 
-  class AscendingTopologicalSort {
-    + sort(graph: GraphType) -> Iterable[NodeType]
+  class AscendingTopologicalSort <NodeType of typing.Hashable> {
+    + sort(graph: GraphType[NodeType]) -> Iterable[NodeType]
   }
 
-  class DescendingTopologicalSort {
-    + sort(graph: GraphType) -> Iterable[NodeType]
+  class DescendingTopologicalSort <NodeType of typing.Hashable> {
+    + sort(graph: GraphType[NodeType]) -> Iterable[NodeType]
   }
 
-  AscendingTopologicalSort .left.> TopologicalSortException : raises
+  AscendingTopologicalSort .left.> TopologicalSortException : raises >
   AscendingTopologicalSort -up-|>  TopologicalSortInterface
   DescendingTopologicalSort -up-|>  TopologicalSortInterface
 }

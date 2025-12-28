@@ -5,7 +5,7 @@ with open('readme.md') as fh:
 
 setuptools.setup(
     name='md.python.graph',
-    version='1.0.0',
+    version='1.1.0',
     description='Set of contracts & operations over graph type',
     long_description=long_description,
     long_description_content_type='text/markdown',
