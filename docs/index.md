@@ -15,19 +15,19 @@ graph type, and provides few useful tools out from box.
 NodeType = typing.TypeVar('NodeType', bound=typing.Hashable)
 GraphType = typing.Mapping[NodeType, typing.Collection[NodeType]]
 GraphPathType = typing.Iterable[NodeType]
-TopologicalSortType = typing.Callable[[GraphType], typing.Iterable[NodeType]]
+TopologicalSortType = typing.Callable[[GraphType[NodeType]], typing.Iterable[NodeType]]
 
 # Implementation 
-def topological_sort_ascending(graph: GraphType) -> typing.Iterable[NodeType]: ...
+def topological_sort_ascending(graph: GraphType[NodeType]) -> typing.Iterable[NodeType]: ...
 
 def topological_sort_descending(
-    graph: GraphType,
+    graph: GraphType[NodeType],
     initial_node: typing.Iterable[NodeType] = None
 ) -> typing.Iterable[NodeType]: ...
 
-def get_paths(graph: GraphType, include_subtree: bool = False) -> typing.Tuple[
-    typing.List[GraphPathType],
-    typing.List[GraphPathType],
+def get_paths(graph: GraphType[NodeType], include_subtree: bool = False) -> typing.Tuple[
+    typing.List[GraphPathType[NodeType]],
+    typing.List[GraphPathType[NodeType]],
 ]: ...
 ```
 
@@ -54,7 +54,7 @@ but defines algorithm direction of nodes traversing.
 #### Ascending topological sorting
 
 ```python3
-def topological_sort_ascending(graph: GraphType) -> typing.Iterable[NodeType]: ...
+def topological_sort_ascending(graph: GraphType[NodeType]) -> typing.Iterable[NodeType]: ...
 ```
 
 Ascending topological sorting performs sorting from the bottom to the top,
@@ -117,7 +117,7 @@ a cycle (see [get_path](#graph-paths-retrieval) below, for example).
 
 ```python3
 def topological_sort_descending(
-    graph: GraphType,
+    graph: GraphType[NodeType],
     initial_node: typing.Iterable[NodeType] = None
 ) -> typing.Iterable[NodeType]: ...
 ```
@@ -188,9 +188,9 @@ and default implementation:
 ### Graph paths retrieval
 
 ```python3
-def get_paths(graph: GraphType, include_subtree: bool = False) -> typing.Tuple[
-    typing.List[GraphPathType],
-    typing.List[GraphPathType],
+def get_paths(graph: GraphType[NodeType], include_subtree: bool = False) -> typing.Tuple[
+    typing.List[GraphPathType[NodeType]],
+    typing.List[GraphPathType[NodeType]],
 ]: ...
 ```
 

@@ -3,7 +3,7 @@ import typing
 
 # Metadata
 __author__ = 'https://md.land/md'
-__version__ = '1.0.0'
+__version__ = '1.1.0'
 __all__ = (
     # Metadata
     '__author__',
@@ -40,13 +40,13 @@ class GraphExceptionInterface:
 class TopologicalSortException(RuntimeError, GraphExceptionInterface):
     CYCLE_DETECTED = 1
 
-    def __init__(self, *args, code: int = 0, graph: GraphType = None, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
+    def __init__(self, *args, code: int = 0, graph: typing.Optional[GraphType] = None) -> None:
+        super().__init__(*args)
         self.code = code
         self.graph = graph
 
     @classmethod
-    def as_cycle_detected(class_, graph: GraphType = None) -> 'TopologicalSortException':
+    def as_cycle_detected(class_, graph: typing.Optional[GraphType] = None) -> 'TopologicalSortException':
         return class_(
             'Unable to perform topological sort, graph contains a cycle',
             code=class_.CYCLE_DETECTED,
@@ -55,8 +55,8 @@ class TopologicalSortException(RuntimeError, GraphExceptionInterface):
 
 
 # Contract
-class TopologicalSortInterface:
-    def sort(self, graph: GraphType) -> typing.Iterable[NodeType]:
+class TopologicalSortInterface(typing.Generic[NodeType]):
+    def sort(self, graph: GraphType[NodeType]) -> typing.Iterable[NodeType]:
         """
         Performs graph topological sorting and returns sequence of nodes
         :param graph: Generic graph structure represented by Mapping of Hashable nodes
@@ -66,7 +66,7 @@ class TopologicalSortInterface:
 
 
 # Implementation
-def topological_sort_ascending(graph: GraphType) -> typing.Iterable[NodeType]:
+def topological_sort_ascending(graph: GraphType[NodeType]) -> typing.Iterable[NodeType]:
     """
     Performs graph topological sorting and returns sequence of nodes (from the bottom)
 
@@ -82,7 +82,7 @@ def topological_sort_ascending(graph: GraphType) -> typing.Iterable[NodeType]:
     for node, related_node_collection in graph.items():
         normalized_graph[node] = set(related_node_collection)
 
-    leave_node_set = set()
+    leave_node_set: typing.Set[NodeType] = set()
 
     # 2. Search for nodes which are not explicitly defined as an empty graph
     for related_node_set in normalized_graph.values():
@@ -100,7 +100,7 @@ def topological_sort_ascending(graph: GraphType) -> typing.Iterable[NodeType]:
             break
 
         try:
-            yield from sorted(leave_node_set)
+            yield from sorted(leave_node_set)  # type: ignore
         except TypeError:
             yield from leave_node_set
 
@@ -116,8 +116,8 @@ def topological_sort_ascending(graph: GraphType) -> typing.Iterable[NodeType]:
 
 
 def topological_sort_descending(
-    graph: GraphType,
-    initial_node: typing.Iterable[NodeType] = None
+    graph: GraphType[NodeType],
+    initial_node: typing.Optional[typing.Iterable[NodeType]] = None
 ) -> typing.Iterable[NodeType]:
     """
     Performs graph topological sorting and returns sequence of nodes (from the top)
@@ -160,9 +160,9 @@ def topological_sort_descending(
                 yield pending_node
 
 
-def get_paths(graph: GraphType, include_subtree: bool = False) -> typing.Tuple[
-    typing.List[GraphPathType],  # path list without cycle
-    typing.List[GraphPathType],  # path list with cycle
+def get_paths(graph: GraphType[NodeType], include_subtree: bool = False) -> typing.Tuple[
+    typing.Sequence[GraphPathType[NodeType]],  # path list without cycle
+    typing.Sequence[GraphPathType[NodeType]],  # path list with cycle
 ]:
     """
     Returns two-sized tuple of graph paths list:
@@ -209,9 +209,9 @@ def get_paths(graph: GraphType, include_subtree: bool = False) -> typing.Tuple[
     # 2. Build result
     node_list = elder_node_heap
     if include_subtree:
-        node_list = node_path_map.keys()
+        node_list = list(node_path_map.keys())
 
-    path_list: typing.List[GraphPathType] = []
+    path_list: typing.List[GraphPathType[NodeType]] = []
     cycle_path_list = []
 
     for root_node in node_list:
@@ -223,11 +223,11 @@ def get_paths(graph: GraphType, include_subtree: bool = False) -> typing.Tuple[
     return path_list, cycle_path_list
 
 
-class AscendingTopologicalSort(TopologicalSortInterface, typing.Generic[NodeType]):
-    def sort(self, graph: GraphType) -> typing.Iterable[NodeType]:
+class AscendingTopologicalSort(TopologicalSortInterface[NodeType]):
+    def sort(self, graph: GraphType[NodeType]) -> typing.Iterable[NodeType]:
         return topological_sort_ascending(graph=graph)
 
 
-class DescendingTopologicalSort(TopologicalSortInterface, typing.Generic[NodeType]):
-    def sort(self, graph: GraphType) -> typing.Iterable[NodeType]:
+class DescendingTopologicalSort(TopologicalSortInterface[NodeType]):
+    def sort(self, graph: GraphType[NodeType]) -> typing.Iterable[NodeType]:
         return topological_sort_descending(graph=graph)
